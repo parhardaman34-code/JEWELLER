@@ -190,28 +190,28 @@
       const pinViewport = document.getElementById('necklace-pin-viewport');
       const scrollPrompt = document.getElementById('necklace-scroll-prompt');
       const ambientBackdrop = document.getElementById('hero-ambient-backdrop');
-      const originalWebsite = document.getElementById('original-website');
       const skipBtn = document.getElementById('skip-to-website-btn');
+      const siteHeader = document.getElementById('site-header');
 
       if (!section || !pinViewport) {
         console.warn('[Rajput ScrollSequence] Section or pin viewport not found in DOM.');
         return;
       }
 
-      // Master ScrollTrigger timeline
+      // Master ScrollTrigger timeline (~4-5 natural mouse scroll clicks = 950px)
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=3200',
+          end: '+=950',
           pin: pinViewport,
-          scrub: 0.6,
+          scrub: 0.5,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            // Toggle scroll prompt
+            // Toggle initial scroll prompt
             if (scrollPrompt) {
-              if (self.progress > 0.03) {
+              if (self.progress > 0.05) {
                 scrollPrompt.style.opacity = '0';
                 scrollPrompt.style.pointerEvents = 'none';
               } else {
@@ -220,10 +220,9 @@
               }
             }
 
-            // Reveal header towards end of assembly transition
-            const siteHeader = document.getElementById('site-header');
+            // Reveal header smoothly as necklace completes assembly
             if (siteHeader) {
-              if (self.progress >= 0.82) {
+              if (self.progress >= 0.70 || window.scrollY >= (self.end - 150)) {
                 siteHeader.classList.add('visible');
               } else {
                 siteHeader.classList.remove('visible');
@@ -235,7 +234,7 @@
 
       scrollTriggerInstance = tl.scrollTrigger;
 
-      // Phase 1: Scrub through frames 1 to 210
+      // Phase 1: Scrub through frames 1 to 210 (assembly)
       tl.to(frameObj, {
         frame: TOTAL_FRAMES,
         ease: 'none',
@@ -245,46 +244,45 @@
         }
       });
 
-      // Phase 2: Hold the final frame
-      tl.to({}, { duration: 0.6 });
+      // Phase 2: Hold the final assembled necklace frame
+      tl.to({}, { duration: 0.5 });
 
-      // Phase 3: Seamless dissolve transition into website state
+      // Phase 3: Seamless dissolve transition into website
       tl.to(canvas, {
-        scale: 1.05,
+        scale: 1.04,
         opacity: 0,
-        ease: 'power2.inOut',
-        duration: 1.2
+        ease: 'power1.inOut',
+        duration: 0.8
       }, 'fadeTransition');
 
       if (ambientBackdrop) {
         tl.to(ambientBackdrop, {
           opacity: 1,
           ease: 'power1.inOut',
-          duration: 1.2
+          duration: 0.8
         }, 'fadeTransition');
       }
 
-      if (originalWebsite) {
-        tl.fromTo(originalWebsite, {
-          opacity: 0.85,
-          y: 40
-        }, {
-          opacity: 1,
-          y: 0,
-          ease: 'power2.out',
-          duration: 1.2
-        }, 'fadeTransition');
-      }
+      // Ensure header stays visible anywhere down on the website
+      window.addEventListener('scroll', () => {
+        if (!siteHeader) return;
+        const triggerEnd = scrollTriggerInstance ? scrollTriggerInstance.end : 950;
+        if (window.scrollY >= triggerEnd - 150) {
+          siteHeader.classList.add('visible');
+        } else if (scrollTriggerInstance && scrollTriggerInstance.progress < 0.70) {
+          siteHeader.classList.remove('visible');
+        }
+      }, { passive: true });
 
       // Skip Button
       if (skipBtn) {
         skipBtn.addEventListener('click', () => {
-          if (scrollTriggerInstance) {
-            window.scrollTo({
-              top: scrollTriggerInstance.end + 10,
-              behavior: 'smooth'
-            });
-          }
+          const scrollTarget = scrollTriggerInstance ? (scrollTriggerInstance.end + 20) : (window.innerHeight + 1000);
+          window.scrollTo({
+            top: scrollTarget,
+            behavior: 'smooth'
+          });
+          if (siteHeader) siteHeader.classList.add('visible');
         });
       }
 
@@ -296,13 +294,14 @@
             top: 0,
             behavior: 'smooth'
           });
+          if (siteHeader) siteHeader.classList.remove('visible');
         });
       }
 
       // Initial render & refresh
       renderFrame(1);
       setTimeout(() => ScrollTrigger.refresh(), 100);
-      setTimeout(() => ScrollTrigger.refresh(), 500);
+      setTimeout(() => ScrollTrigger.refresh(), 400);
     }
 
     function init() {
