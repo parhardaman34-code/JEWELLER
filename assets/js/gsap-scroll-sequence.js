@@ -25,18 +25,19 @@
     let lastRenderedIdx = -1;
     let scrollTriggerInstance = null;
 
-    const section = document.getElementById('necklace-scroll-section');
-    const pinViewport = document.getElementById('necklace-pin-viewport');
-    const container = document.getElementById('necklace-canvas-container');
+    const heroSection = document.getElementById('hero-section');
+    const container = document.getElementById('hero-necklace-container');
     const fallbackImg = document.getElementById('necklace-fallback-img');
     const canvas = document.getElementById('necklace-canvas');
     const scrollPrompt = document.getElementById('necklace-scroll-prompt');
-    const skipBtn = document.getElementById('skip-to-website-btn');
     const replayBtn = document.getElementById('replay-cinematic-pill');
     const siteHeader = document.getElementById('site-header');
 
-    if (!section || !pinViewport || !canvas) {
-      console.error('[Royal Jewellers] Essential DOM elements missing for scroll sequence.');
+    if (!container || !canvas) {
+      console.warn('[Royal Jewellers] Hero necklace container or canvas missing; skipping frame sequence.');
+      setupNavigation();
+      setupMagneticButtons();
+      setupMultiPlaneParallax();
       return;
     }
 
@@ -86,7 +87,7 @@
       const w = canvas.width;
       const h = canvas.height;
 
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = '#09090b';
       ctx.fillRect(0, 0, w, h);
 
       const imgW = img.naturalWidth || 1280;
@@ -111,9 +112,12 @@
       ctx.drawImage(img, drawX, drawY, drawW, drawH);
       lastRenderedIdx = targetIdx;
 
-      // Hide fallback img now that canvas has drawn its first content
-      if (fallbackImg && fallbackImg.style.display !== 'none') {
-        fallbackImg.style.display = 'none';
+      // Smoothly hide fallback image now that canvas has drawn its first content
+      if (fallbackImg && fallbackImg.style.opacity !== '0') {
+        fallbackImg.style.opacity = '0';
+        setTimeout(() => {
+          if (fallbackImg) fallbackImg.style.display = 'none';
+        }, 500);
       }
     }
 
@@ -122,8 +126,11 @@
       const rect = container.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      const w = Math.max(320, Math.round(rect.width * dpr));
-      const h = Math.max(240, Math.round(rect.height * dpr));
+      const rectWidth = rect.width || container.clientWidth || 600;
+      const rectHeight = rect.height || container.clientHeight || 500;
+
+      const w = Math.max(320, Math.round(rectWidth * dpr));
+      const h = Math.max(240, Math.round(rectHeight * dpr));
 
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
@@ -146,6 +153,13 @@
         if (scrollTriggerInstance) ScrollTrigger.refresh();
       };
 
+      // 1b. Preload Frame 210 (fully assembled) early for crisp end state
+      const fEnd = new Image();
+      fEnd.src = getFrameUrl(TOTAL_FRAMES);
+      fEnd.onload = () => {
+        frames[TOTAL_FRAMES - 1] = fEnd;
+      };
+
       // 2. Initial scrub batch (frames 2 to 35)
       for (let i = 2; i <= 35 && i <= TOTAL_FRAMES; i++) {
         const img = new Image();
@@ -159,10 +173,12 @@
         if (start > TOTAL_FRAMES) return;
         const end = Math.min(TOTAL_FRAMES, start + batchSize - 1);
         for (let i = start; i <= end; i++) {
-          const img = new Image();
-          img.src = getFrameUrl(i);
-          const idx = i - 1;
-          img.onload = () => { frames[idx] = img; };
+          if (!frames[i - 1]) {
+            const img = new Image();
+            img.src = getFrameUrl(i);
+            const idx = i - 1;
+            img.onload = () => { frames[idx] = img; };
+          }
         }
         setTimeout(() => loadRemainingBatch(end + 1, batchSize), 40);
       }
@@ -170,21 +186,35 @@
       setTimeout(() => loadRemainingBatch(36, 30), 100);
     }
 
-    // Build the GSAP ScrollTrigger timeline
+    // Build the GSAP ScrollTrigger timeline & Hero interactions
     function setupScrollTrigger() {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
+      // 1. Header transparency / frosted glass on scroll
+      const updateHeader = () => {
+        if (!siteHeader) return;
+        if (window.scrollY >= 50) {
+          siteHeader.classList.add('header-scrolled');
+        } else {
+          siteHeader.classList.remove('header-scrolled');
+        }
+      };
+      window.addEventListener('scroll', updateHeader, { passive: true });
+      updateHeader();
+
+      // 2. Scrub frames smoothly as user scrolls past the hero section
+      if (heroSection) {
+        scrollTriggerInstance = ScrollTrigger.create({
+          trigger: heroSection,
           start: 'top top',
-          end: '+=950', // 4 to 5 natural mouse-wheel scrolls
-          pin: pinViewport,
-          scrub: 0.5,
-          anticipatePin: 1,
+          end: 'bottom top+=100',
+          scrub: 0.6,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            // Hide scroll prompt once user starts scrolling
+            const target = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(1 + self.progress * (TOTAL_FRAMES - 1))));
+            frameObj.frame = target;
+            renderFrame(target);
+
             if (scrollPrompt) {
-              if (self.progress > 0.05) {
+              if (self.progress > 0.08) {
                 scrollPrompt.style.opacity = '0';
                 scrollPrompt.style.pointerEvents = 'none';
               } else {
@@ -192,72 +222,55 @@
                 scrollPrompt.style.pointerEvents = 'auto';
               }
             }
-
-            // Deepen transparent header on scroll
-            if (siteHeader) {
-              if (self.progress >= 0.35 || window.scrollY >= 200) {
-                siteHeader.classList.add('header-scrolled');
-              } else {
-                siteHeader.classList.remove('header-scrolled');
-              }
-            }
           }
-        }
-      });
-
-      scrollTriggerInstance = tl.scrollTrigger;
-
-      // Phase 1: Scrub frames 1 -> 210
-      tl.to(frameObj, {
-        frame: TOTAL_FRAMES,
-        ease: 'none',
-        duration: 3,
-        onUpdate: () => {
-          renderFrame(frameObj.frame);
-        }
-      });
-
-      // Phase 2: Hold complete necklace
-      tl.to({}, { duration: 0.5 });
-
-      // Phase 3: Dissolve canvas into website
-      tl.to(canvas, {
-        scale: 1.04,
-        opacity: 0,
-        ease: 'power1.inOut',
-        duration: 0.8
-      });
-
-      // Scroll listener: toggles transparent glass vs frosted scrolled glass
-      window.addEventListener('scroll', () => {
-        if (!siteHeader) return;
-        if (window.scrollY >= 150) {
-          siteHeader.classList.add('header-scrolled');
-        } else if (scrollTriggerInstance && scrollTriggerInstance.progress < 0.35) {
-          siteHeader.classList.remove('header-scrolled');
-        }
-      }, { passive: true });
-
-      // Skip Button
-      if (skipBtn) {
-        skipBtn.addEventListener('click', () => {
-          const targetY = scrollTriggerInstance ? (scrollTriggerInstance.end + 20) : (window.innerHeight + 950);
-          window.scrollTo({
-            top: targetY,
-            behavior: 'smooth'
-          });
-          if (siteHeader) siteHeader.classList.add('header-scrolled');
         });
       }
 
-      // Replay Button
+      // 3. Interactive horizontal mouse tracking across the 3D necklace card
+      if (container) {
+        container.addEventListener('mousemove', (e) => {
+          const rect = container.getBoundingClientRect();
+          const progress = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          const target = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(1 + progress * (TOTAL_FRAMES - 1))));
+          gsap.to(frameObj, {
+            frame: target,
+            duration: 0.25,
+            ease: 'power1.out',
+            overwrite: 'auto',
+            onUpdate: () => renderFrame(frameObj.frame)
+          });
+        });
+      }
+
+      // 4. Auto-assembly intro sequence on initial load if user stays at top
+      function playIntroAnimation() {
+        if (window.scrollY < 80) {
+          gsap.to(frameObj, {
+            frame: TOTAL_FRAMES,
+            duration: 2.6,
+            ease: 'power2.out',
+            onUpdate: () => renderFrame(frameObj.frame)
+          });
+        }
+      }
+
+      // 5. Replay Floating Pill Button
       if (replayBtn) {
         replayBtn.addEventListener('click', () => {
           window.scrollTo({
             top: 0,
             behavior: 'smooth'
           });
-          if (siteHeader) siteHeader.classList.remove('header-scrolled');
+          frameObj.frame = 1;
+          renderFrame(1);
+          setTimeout(() => {
+            gsap.to(frameObj, {
+              frame: TOTAL_FRAMES,
+              duration: 2.8,
+              ease: 'power2.out',
+              onUpdate: () => renderFrame(frameObj.frame)
+            });
+          }, 450);
         });
       }
 
@@ -265,6 +278,7 @@
       renderFrame(1);
       setTimeout(() => ScrollTrigger.refresh(), 100);
       setTimeout(() => ScrollTrigger.refresh(), 400);
+      setTimeout(playIntroAnimation, 650);
 
       // Initialize navigation interactivity & smooth scrolling
       setupNavigation();
