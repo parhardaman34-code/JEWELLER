@@ -76,7 +76,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`=======================================================`);
   console.log(` Rajput Jewellers - Local Development Server`);
   console.log(` Running at: http://localhost:${PORT}`);
