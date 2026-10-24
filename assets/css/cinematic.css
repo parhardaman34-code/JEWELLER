@@ -74,12 +74,25 @@ body {
   background-color: #000000;
 }
 
+#necklace-fallback-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  z-index: 1;
+}
+
 #necklace-canvas {
+  position: absolute;
+  inset: 0;
   width: 100% !important;
   height: 100% !important;
   object-fit: contain;
   display: block;
   transform-origin: center center;
+  z-index: 2;
 }
 
 /* Subtle, non-intrusive scroll prompt */

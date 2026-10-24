@@ -1,59 +1,67 @@
 /**
  * RAJPUT JEWELLERS - GSAP PINNED FRAME SEQUENCE & WEBSITE TRANSITION
- * Ultra-robust edition: Works across Localhost, GitHub Pages (subpaths), and Vercel CDN.
- * Powered by GSAP 3 + ScrollTrigger
+ * Bulletproof Production Edition: Zero-blank screen, instant image fallback, rock-solid scroll.
  */
 
 (function () {
   'use strict';
 
-  function bootstrap() {
+  function initSequence() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-      console.warn('[Rajput ScrollSequence] GSAP or ScrollTrigger not ready yet, retrying...');
-      setTimeout(bootstrap, 50);
+      console.warn('[Rajput] GSAP / ScrollTrigger not yet available, retrying in 50ms...');
+      setTimeout(initSequence, 50);
       return;
     }
 
-    gsap.registerPlugin(ScrollTrigger);
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+    } catch (e) {
+      console.warn('[Rajput] ScrollTrigger registration note:', e);
+    }
 
     const TOTAL_FRAMES = 210;
-    let canvas = null;
-    let ctx = null;
-    let container = null;
-
-    // Cache of Image objects
     const frames = new Array(TOTAL_FRAMES);
-    let lastRenderedIdx = -1;
-    let firstFrameLoaded = false;
     const frameObj = { frame: 1 };
+    let lastRenderedIdx = -1;
     let scrollTriggerInstance = null;
 
-    /**
-     * Resolves absolute asset URL using document.baseURI.
-     * Ensures flawless loading on:
-     * - Localhost: http://localhost:3000/assets/frames/...
-     * - Vercel: https://domain.vercel.app/assets/frames/...
-     * - GitHub Pages: https://username.github.io/repo-name/assets/frames/...
-     */
-    function getFrameSrc(index) {
-      const padded = String(index).padStart(3, '0');
+    const section = document.getElementById('necklace-scroll-section');
+    const pinViewport = document.getElementById('necklace-pin-viewport');
+    const container = document.getElementById('necklace-canvas-container');
+    const fallbackImg = document.getElementById('necklace-fallback-img');
+    const canvas = document.getElementById('necklace-canvas');
+    const scrollPrompt = document.getElementById('necklace-scroll-prompt');
+    const skipBtn = document.getElementById('skip-to-website-btn');
+    const replayBtn = document.getElementById('replay-cinematic-pill');
+    const siteHeader = document.getElementById('site-header');
+
+    if (!section || !pinViewport || !canvas) {
+      console.error('[Rajput] Essential DOM elements missing for scroll sequence.');
+      return;
+    }
+
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    // Dynamic URL resolution based on current document location
+    function getFrameUrl(idx) {
+      const padded = String(idx).padStart(3, '0');
+      const filename = `assets/frames/ezgif-frame-${padded}.jpg`;
       try {
-        return new URL(`assets/frames/ezgif-frame-${padded}.jpg`, document.baseURI).href;
+        const base = document.baseURI || window.location.href;
+        return new URL(filename, base).href;
       } catch (e) {
-        return `assets/frames/ezgif-frame-${padded}.jpg`;
+        return filename;
       }
     }
 
-    /**
-     * Render a frame to canvas with aspect ratio preservation
-     */
+    // Render frame to canvas with aspect ratio containment
     function renderFrame(frameNumber) {
       if (!ctx || !canvas) return;
 
       const targetIdx = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(frameNumber) - 1));
       let img = frames[targetIdx];
 
-      // If target frame not yet loaded over network, find nearest loaded frame
+      // If requested frame isn't loaded yet, find nearest loaded frame
       if (!img || !img.complete || img.naturalWidth === 0) {
         let bestDist = Infinity;
         let bestImg = null;
@@ -71,14 +79,13 @@
         } else if (lastRenderedIdx >= 0 && frames[lastRenderedIdx]?.complete) {
           img = frames[lastRenderedIdx];
         } else {
-          return; // No frame ready yet
+          return; // No frame ready yet; fallbackImg is visible underneath
         }
       }
 
       const w = canvas.width;
       const h = canvas.height;
 
-      // Draw background
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, w, h);
 
@@ -103,6 +110,11 @@
 
       ctx.drawImage(img, drawX, drawY, drawW, drawH);
       lastRenderedIdx = targetIdx;
+
+      // Hide fallback img now that canvas has drawn its first content
+      if (fallbackImg && fallbackImg.style.display !== 'none') {
+        fallbackImg.style.display = 'none';
+      }
     }
 
     function resizeCanvas() {
@@ -110,12 +122,12 @@
       const rect = container.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      const newW = Math.max(320, Math.round(rect.width * dpr));
-      const newH = Math.max(240, Math.round(rect.height * dpr));
+      const w = Math.max(320, Math.round(rect.width * dpr));
+      const h = Math.max(240, Math.round(rect.height * dpr));
 
-      if (canvas.width !== newW || canvas.height !== newH) {
-        canvas.width = newW;
-        canvas.height = newH;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
       }
@@ -123,93 +135,54 @@
       renderFrame(frameObj.frame);
     }
 
-    /**
-     * Prioritized progressive preloader
-     */
+    // Preload frames progressively
     function preloadFrames() {
-      // 1. Load Frame 1 with top priority
-      const img1 = new Image();
-      img1.crossOrigin = 'anonymous';
-      img1.src = getFrameSrc(1);
-
-      img1.onload = () => {
-        frames[0] = img1;
-        firstFrameLoaded = true;
+      // 1. Frame 1 first
+      const f1 = new Image();
+      f1.src = getFrameUrl(1);
+      f1.onload = () => {
+        frames[0] = f1;
         renderFrame(1);
-        if (scrollTriggerInstance) {
-          ScrollTrigger.refresh();
-        }
+        if (scrollTriggerInstance) ScrollTrigger.refresh();
       };
 
-      img1.onerror = () => {
-        console.error('[Rajput ScrollSequence] Failed to load Frame 1 from:', img1.src);
-      };
-
-      // 2. Load Frame 2 to 30 immediately (first scrub chunk)
-      const loadChunk = (start, end) => {
-        for (let i = start; i <= end && i <= TOTAL_FRAMES; i++) {
-          const idx = i - 1;
-          if (frames[idx]) continue;
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.src = getFrameSrc(i);
-          img.onload = () => {
-            frames[idx] = img;
-          };
-        }
-      };
-
-      // Immediate chunk for initial scroll interaction
-      loadChunk(2, 35);
-
-      // Remaining frames loaded in idle/background batches
-      const loadRemaining = () => {
-        let current = 36;
-        const step = 25;
-        function nextBatch() {
-          if (current > TOTAL_FRAMES) return;
-          loadChunk(current, current + step - 1);
-          current += step;
-          setTimeout(nextBatch, 40);
-        }
-        setTimeout(nextBatch, 100);
-      };
-
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadRemaining);
-      } else {
-        setTimeout(loadRemaining, 200);
+      // 2. Initial scrub batch (frames 2 to 35)
+      for (let i = 2; i <= 35 && i <= TOTAL_FRAMES; i++) {
+        const img = new Image();
+        img.src = getFrameUrl(i);
+        const idx = i - 1;
+        img.onload = () => { frames[idx] = img; };
       }
+
+      // 3. Background batches for remaining frames
+      function loadRemainingBatch(start, batchSize) {
+        if (start > TOTAL_FRAMES) return;
+        const end = Math.min(TOTAL_FRAMES, start + batchSize - 1);
+        for (let i = start; i <= end; i++) {
+          const img = new Image();
+          img.src = getFrameUrl(i);
+          const idx = i - 1;
+          img.onload = () => { frames[idx] = img; };
+        }
+        setTimeout(() => loadRemainingBatch(end + 1, batchSize), 40);
+      }
+
+      setTimeout(() => loadRemainingBatch(36, 30), 100);
     }
 
-    /**
-     * Set up GSAP ScrollTrigger timeline
-     */
+    // Build the GSAP ScrollTrigger timeline
     function setupScrollTrigger() {
-      const section = document.getElementById('necklace-scroll-section');
-      const pinViewport = document.getElementById('necklace-pin-viewport');
-      const scrollPrompt = document.getElementById('necklace-scroll-prompt');
-      const ambientBackdrop = document.getElementById('hero-ambient-backdrop');
-      const skipBtn = document.getElementById('skip-to-website-btn');
-      const siteHeader = document.getElementById('site-header');
-
-      if (!section || !pinViewport) {
-        console.warn('[Rajput ScrollSequence] Section or pin viewport not found in DOM.');
-        return;
-      }
-
-      // Master ScrollTrigger timeline (~4-5 natural mouse scroll clicks = 950px)
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=950',
+          end: '+=950', // 4 to 5 natural mouse-wheel scrolls
           pin: pinViewport,
           scrub: 0.5,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            // Toggle initial scroll prompt
+            // Hide scroll prompt once user starts scrolling
             if (scrollPrompt) {
               if (self.progress > 0.05) {
                 scrollPrompt.style.opacity = '0';
@@ -220,7 +193,7 @@
               }
             }
 
-            // Reveal header smoothly as necklace completes assembly
+            // Smoothly reveal header towards completion
             if (siteHeader) {
               if (self.progress >= 0.70 || window.scrollY >= (self.end - 150)) {
                 siteHeader.classList.add('visible');
@@ -234,7 +207,7 @@
 
       scrollTriggerInstance = tl.scrollTrigger;
 
-      // Phase 1: Scrub through frames 1 to 210 (assembly)
+      // Phase 1: Scrub frames 1 -> 210
       tl.to(frameObj, {
         frame: TOTAL_FRAMES,
         ease: 'none',
@@ -244,29 +217,21 @@
         }
       });
 
-      // Phase 2: Hold the final assembled necklace frame
+      // Phase 2: Hold complete necklace
       tl.to({}, { duration: 0.5 });
 
-      // Phase 3: Seamless dissolve transition into website
+      // Phase 3: Dissolve canvas into website
       tl.to(canvas, {
         scale: 1.04,
         opacity: 0,
         ease: 'power1.inOut',
         duration: 0.8
-      }, 'fadeTransition');
+      });
 
-      if (ambientBackdrop) {
-        tl.to(ambientBackdrop, {
-          opacity: 1,
-          ease: 'power1.inOut',
-          duration: 0.8
-        }, 'fadeTransition');
-      }
-
-      // Ensure header stays visible anywhere down on the website
+      // Scroll listener: guarantees header is visible on website
       window.addEventListener('scroll', () => {
         if (!siteHeader) return;
-        const triggerEnd = scrollTriggerInstance ? scrollTriggerInstance.end : 950;
+        const triggerEnd = scrollTriggerInstance ? scrollTriggerInstance.end : 900;
         if (window.scrollY >= triggerEnd - 150) {
           siteHeader.classList.add('visible');
         } else if (scrollTriggerInstance && scrollTriggerInstance.progress < 0.70) {
@@ -277,9 +242,9 @@
       // Skip Button
       if (skipBtn) {
         skipBtn.addEventListener('click', () => {
-          const scrollTarget = scrollTriggerInstance ? (scrollTriggerInstance.end + 20) : (window.innerHeight + 1000);
+          const targetY = scrollTriggerInstance ? (scrollTriggerInstance.end + 20) : (window.innerHeight + 950);
           window.scrollTo({
-            top: scrollTarget,
+            top: targetY,
             behavior: 'smooth'
           });
           if (siteHeader) siteHeader.classList.add('visible');
@@ -287,7 +252,6 @@
       }
 
       // Replay Button
-      const replayBtn = document.getElementById('replay-cinematic-pill');
       if (replayBtn) {
         replayBtn.addEventListener('click', () => {
           window.scrollTo({
@@ -298,48 +262,28 @@
         });
       }
 
-      // Initial render & refresh
+      // Render initial frame
       renderFrame(1);
       setTimeout(() => ScrollTrigger.refresh(), 100);
       setTimeout(() => ScrollTrigger.refresh(), 400);
     }
 
-    function init() {
-      container = document.getElementById('necklace-canvas-container');
-      if (!container) return;
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas, { passive: true });
+    window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 150));
 
-      canvas = document.getElementById('necklace-canvas');
-      if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.id = 'necklace-canvas';
-        container.appendChild(canvas);
-      }
+    setupScrollTrigger();
+    preloadFrames();
 
-      ctx = canvas.getContext('2d', { alpha: false });
-
+    window.addEventListener('load', () => {
       resizeCanvas();
-      window.addEventListener('resize', resizeCanvas, { passive: true });
-      window.addEventListener('orientationchange', () => {
-        setTimeout(resizeCanvas, 150);
-      });
-
-      // Set up ScrollTrigger and begin preloading simultaneously
-      setupScrollTrigger();
-      preloadFrames();
-
-      // Refresh ScrollTrigger after full window load
-      window.addEventListener('load', () => {
-        resizeCanvas();
-        ScrollTrigger.refresh();
-      });
-    }
-
-    init();
+      ScrollTrigger.refresh();
+    });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bootstrap);
+    document.addEventListener('DOMContentLoaded', initSequence);
   } else {
-    bootstrap();
+    initSequence();
   }
 })();
