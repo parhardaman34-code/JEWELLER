@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "start": "node local-server.js",
-    "dev": "node local-server.js"
+    "dev": "node local-server.js",
+    "build": "echo 'Static site ready'"
   },
   "keywords": [
     "jewellery",
@@ -15,8 +16,5 @@
     "gold"
   ],
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "sharp": "^0.35.5"
-  }
+  "license": "ISC"
 }
