@@ -18,73 +18,8 @@
   // Layer Elements
   let layerAerial, layerApproach, layerInterior, doorsWrapper;
   let telemetryAlt, telemetryLoc, progressBar;
-  let skipBtn, audioBtn, replayPill, enterBtn;
+  let skipBtn, replayPill, enterBtn;
   let masterExperience, droneStage, necklaceStage;
-
-  // Web Audio Synthesizer for ambient warmth & crystal showroom chime
-  function initAudio() {
-    if (audioContext) return;
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      audioContext = new AudioCtx();
-
-      // Ambient low warm drone
-      const osc1 = audioContext.createOscillator();
-      const osc2 = audioContext.createOscillator();
-      ambientGain = audioContext.createGain();
-
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(110, audioContext.currentTime); // A2 warm harmonic
-      osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(164.8, audioContext.currentTime); // E3 fifth harmonic
-
-      ambientGain.gain.setValueAtTime(isMuted ? 0 : 0.08, audioContext.currentTime);
-
-      osc1.connect(ambientGain);
-      osc2.connect(ambientGain);
-      ambientGain.connect(audioContext.destination);
-
-      osc1.start();
-      osc2.start();
-    } catch (e) {
-      console.warn("Web Audio not supported or blocked", e);
-    }
-  }
-
-  function playShowroomChime() {
-    if (!audioContext || isMuted) return;
-    try {
-      const chimeOsc = audioContext.createOscillator();
-      const chimeGain = audioContext.createGain();
-      chimeOsc.type = 'sine';
-      chimeOsc.frequency.setValueAtTime(587.33, audioContext.currentTime); // D5
-      chimeOsc.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.6); // A5
-
-      chimeGain.gain.setValueAtTime(0.12, audioContext.currentTime);
-      chimeGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 2.5);
-
-      chimeOsc.connect(chimeGain);
-      chimeGain.connect(audioContext.destination);
-      chimeOsc.start();
-      chimeOsc.stop(audioContext.currentTime + 2.6);
-    } catch (e) {}
-  }
-
-  function toggleAudio() {
-    isMuted = !isMuted;
-    if (!audioContext) initAudio();
-    if (audioContext && audioContext.state === 'suspended') {
-      audioContext.resume();
-    }
-    if (ambientGain && audioContext) {
-      ambientGain.gain.setTargetAtTime(isMuted ? 0 : 0.08, audioContext.currentTime, 0.1);
-    }
-    if (audioBtn) {
-      audioBtn.innerHTML = isMuted
-        ? '<span class="material-symbols-outlined text-[16px]">volume_off</span><span>Sound</span>'
-        : '<span class="material-symbols-outlined text-[16px] text-primary-fixed">volume_up</span><span>Sound On</span>';
-    }
-  }
 
   // Smooth easing functions
   function easeInOutCubic(t) {
@@ -173,12 +108,6 @@
         if (t3 > 0.15) {
           doorsWrapper.classList.add('doors-open');
         }
-      }
-
-      // Play welcoming crystal chime once
-      if (t3 > 0.3 && !window._chimePlayed) {
-        window._chimePlayed = true;
-        playShowroomChime();
       }
     }
 
@@ -297,7 +226,6 @@
     progressBar = document.getElementById('cinematic-progress');
 
     skipBtn = document.getElementById('skip-intro-btn');
-    audioBtn = document.getElementById('audio-toggle-btn');
     enterBtn = document.getElementById('enter-showroom-btn');
     replayPill = document.getElementById('replay-cinematic-pill');
 
@@ -309,10 +237,6 @@
           completeAndRevealHomepage();
         }
       });
-    }
-
-    if (audioBtn) {
-      audioBtn.addEventListener('click', toggleAudio);
     }
 
     if (enterBtn) {

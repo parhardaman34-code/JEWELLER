@@ -142,50 +142,23 @@
     ctx.drawImage(imgToDraw, drawX, drawY, drawW, drawH);
   }
 
-  // Update UI HUD text, progress tracker dots, and scrubber
+  // Update UI & Transition triggers
   function updateUI(frameNumber) {
-    const progress = (frameNumber - 1) / (TOTAL_FRAMES - 1);
-    const badgeEl = document.getElementById('assembly-step-badge');
-    const titleEl = document.getElementById('assembly-step-title');
-    const descEl = document.getElementById('assembly-step-desc');
+    const hintEl = document.getElementById('necklace-scroll-hint');
     const enterBtn = document.getElementById('enter-showroom-btn');
-    const scrubberFill = document.getElementById('necklace-scrubber-fill');
-    const scrubberHandle = document.getElementById('necklace-scrubber-handle');
-    const counterEl = document.getElementById('necklace-frame-counter');
 
-    // Find current phase
-    let currentPhase = PHASES[0];
-    let phaseIndex = 1;
-    for (let i = 0; i < PHASES.length; i++) {
-      if (frameNumber <= PHASES[i].maxFrame) {
-        currentPhase = PHASES[i];
-        phaseIndex = i + 1;
-        break;
+    // Fade out scroll hint once user starts scrubbing
+    if (hintEl) {
+      if (frameNumber > 8) {
+        hintEl.classList.add('fade-out');
+      } else {
+        hintEl.classList.remove('fade-out');
       }
     }
 
-    if (badgeEl) badgeEl.textContent = currentPhase.badge;
-    if (titleEl) titleEl.textContent = currentPhase.title;
-    if (descEl) descEl.textContent = currentPhase.desc;
-    if (counterEl) counterEl.textContent = `Frame ${Math.round(frameNumber)} / ${TOTAL_FRAMES}`;
-
-    // Update scrubber progress bar
-    if (scrubberFill) scrubberFill.style.width = `${progress * 100}%`;
-    if (scrubberHandle) scrubberHandle.style.left = `${progress * 100}%`;
-
-    // Update step dots
-    for (let i = 1; i <= 5; i++) {
-      const dot = document.getElementById(`step-dot-${i}`);
-      if (dot) {
-        dot.classList.remove('active', 'completed');
-        if (i === phaseIndex) dot.classList.add('active');
-        else if (i < phaseIndex) dot.classList.add('completed');
-      }
-    }
-
-    // Reveal Enter Showroom button at frame 200+
+    // Reveal Enter Showroom button when assembled (frame 205+)
     if (enterBtn) {
-      if (frameNumber >= 200) {
+      if (frameNumber >= 205) {
         enterBtn.classList.add('visible');
         isCompleted = true;
       } else {
@@ -237,9 +210,9 @@
 
     if (e.deltaY > 0) {
       if (targetFrameIndex >= TOTAL_FRAMES && isCompleted) {
-        // If at the end and scrolling more, transition to homepage
+        // If at the end and scrolling more, smoothly transition to homepage
         scrollDeltaBuffer += e.deltaY;
-        if (scrollDeltaBuffer > 120) {
+        if (scrollDeltaBuffer > 35) {
           scrollDeltaBuffer = 0;
           window.RajputCinematic && window.RajputCinematic.completeAndRevealHomepage();
         }
@@ -276,7 +249,7 @@
 
         if (diffY > 0 && targetFrameIndex >= TOTAL_FRAMES && isCompleted) {
           scrollDeltaBuffer += diffY;
-          if (scrollDeltaBuffer > 60) {
+          if (scrollDeltaBuffer > 20) {
             scrollDeltaBuffer = 0;
             window.RajputCinematic && window.RajputCinematic.completeAndRevealHomepage();
           }

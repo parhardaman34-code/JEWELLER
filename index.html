@@ -19,10 +19,6 @@
       </div>
     </div>
     <div class="cinematic-controls">
-      <button id="audio-toggle-btn" class="cinematic-btn" type="button" aria-label="Toggle Sound">
-        <span class="material-symbols-outlined text-[16px]">volume_off</span>
-        <span>Sound</span>
-      </button>
       <button id="skip-intro-btn" class="cinematic-btn skip-btn" type="button" aria-label="Skip Intro">
         <span>Skip Intro</span>
         <span class="material-symbols-outlined text-[16px]">fast_forward</span>
@@ -66,37 +62,11 @@
       <canvas id="necklace-canvas"></canvas>
     </div>
 
-    <!-- Necklace Assembly HUD & Progress Controls -->
+    <!-- Clean, Non-obstructive Scroll Guide & Transition Trigger -->
     <div class="necklace-hud">
-      <div class="assembly-info">
-        <div class="flex items-center justify-between mb-1">
-          <span id="assembly-step-badge" class="assembly-step-badge">Phase 1 / 5</span>
-          <span id="necklace-frame-counter" class="text-[11px] text-[#ffd700] uppercase tracking-wider font-semibold">Frame 1 / 210</span>
-        </div>
-        <h3 id="assembly-step-title" class="assembly-step-title">Handcrafted 22KT Heirloom Components</h3>
-        <p id="assembly-step-desc" class="assembly-step-desc">Individual bridal karigari elements floating in showroom space. Scroll down to assemble.</p>
-        
-        <!-- Interactive Scrubber Track -->
-        <div class="mt-3 flex items-center gap-2">
-          <span class="text-[10px] uppercase tracking-wider text-[#d3c4af]">Scrub:</span>
-          <div id="necklace-scrubber-track" class="relative flex-1 h-2 bg-[#2d241a] rounded-full cursor-pointer overflow-hidden border border-[rgba(212,175,55,0.3)]">
-            <div id="necklace-scrubber-fill" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-[#785600] via-[#d4af37] to-[#ffd700] w-0 transition-all duration-75"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="assembly-tracker">
-        <div id="step-dot-1" class="assembly-dot active" title="Phase 1: Components"></div>
-        <div id="step-dot-2" class="assembly-dot" title="Phase 2: Collar Mesh"></div>
-        <div id="step-dot-3" class="assembly-dot" title="Phase 3: Central Medallion"></div>
-        <div id="step-dot-4" class="assembly-dot" title="Phase 4: Earrings & Drops"></div>
-        <div id="step-dot-5" class="assembly-dot" title="Phase 5: Masterpiece Complete"></div>
-      </div>
-
-      <div class="scroll-prompt-indicator">
-        <span class="material-symbols-outlined text-[16px]">expand_more</span>
-        <span>Scroll Down to Assemble Royal Suite</span>
-        <span class="material-symbols-outlined text-[16px]">expand_more</span>
+      <div id="necklace-scroll-hint" class="necklace-scroll-hint">
+        <span class="tracking-widest uppercase text-xs text-[#ffd700] font-semibold drop-shadow-md">Scroll down to assemble heirloom suite</span>
+        <span class="material-symbols-outlined text-[18px] text-[#ffd700] animate-bounce">expand_more</span>
       </div>
 
       <button id="enter-showroom-btn" class="enter-showroom-btn" type="button">
@@ -162,13 +132,13 @@
 <!-- High-Impact Artifact Display Showcase -->
 <div class="lg:col-span-7 order-1 lg:order-2">
 <div class="relative rounded-2xl overflow-hidden shadow-xl bg-surface-container">
-<img alt="Rajput Jewellers Handcrafted Regal Bridal Kundan Polki Choker Suite with Jhumkas and Bangles on Deep Velvet" class="w-full h-[440px] lg:h-[560px] object-cover object-center transform hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuNqGBc-ux6RtFnOs_0wPVX9JenO0a_foGTwFP3G8Lq1pS4GvYrkDNqOKQSPAuPaT_boQiI1mGg-fKx1yGBvLT4uEDf9Erpimp2UDeH74PCtM6o8GNxYfI6c7RlCg0UnxLru9QVqTzOhUwVeh7M9IMhcdlPq6or61Km6xH51vRYq_pq5ebBQ22yaURjTLCLz4Rl7CaPSugVj2AZjsrRDpz5zEQo-Pd9ucZL113QUPF-gEq6AkOdQI"/>
+<img alt="Rajput Jewellers Handcrafted Regal Bridal Kundan Polki Choker Suite with Jhumkas on Deep Velvet" class="w-full h-[440px] lg:h-[560px] object-cover object-center transform hover:scale-105 transition-transform duration-700 ease-out" src="assets/images/assembled_necklace_hero.jpg"/>
 <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/20 to-transparent pointer-events-none"></div>
 <div class="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-wrap items-end justify-between gap-space-sm">
 <div class="bg-surface/90 backdrop-blur-md rounded-xl p-space-sm max-w-sm">
 <span class="font-label-sm text-label-sm uppercase tracking-widest text-primary font-bold block mb-1">Masterpiece Suite</span>
-<p class="font-headline-sm text-headline-sm text-on-surface font-serif leading-snug">Imperial Meenakari &amp; Uncut Polki Raani Haar</p>
-<span class="font-body-sm text-body-sm text-on-surface-variant mt-1 block">Hallmarked 22KT Pure Gold • Certified Columbian Emeralds</span>
+<p class="font-headline-sm text-headline-sm text-on-surface font-serif leading-snug">Imperial 22K Kundan Polki Choker Suite with Matching Earrings</p>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1 block">Hallmarked 22KT Pure Gold • Certified Columbian Emeralds &amp; Basra Pearls</span>
 </div>
 <div class="bg-inverse-surface/90 backdrop-blur-md text-inverse-on-surface px-space-md py-space-xs rounded-xl flex items-center gap-2">
 <span class="material-symbols-outlined text-primary-fixed text-[20px]">verified</span>
