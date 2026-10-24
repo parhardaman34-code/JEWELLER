@@ -1,3 +1,5 @@
+package.json
+package-lock.json
 local-server.js
 server.js
 scripts/
@@ -5,3 +7,6 @@ start.bat
 deploy.bat
 push-to-github.bat
 *.backup.*
+code.html
+screen.png
+DESIGN.md
