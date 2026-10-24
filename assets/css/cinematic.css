@@ -3,10 +3,11 @@
    ========================================================================== */
 
 :root {
-  --gold-primary: #d4af37;
-  --gold-bright: #ffd700;
-  --gold-glow: rgba(212, 175, 55, 0.45);
-  --velvet-dark: #0a0806;
+  --purple-primary: #a855f7;
+  --purple-bright: #c084fc;
+  --purple-glow: rgba(168, 85, 247, 0.45);
+  --zinc-dark: #18181b;
+  --zinc-metallic: #a1a1aa;
 }
 
 html {
@@ -15,7 +16,8 @@ html {
 
 body {
   overflow-x: hidden;
-  background-color: #fff8f5;
+  background-color: #18181b;
+  color: #f4f4f5;
 }
 
 /* Custom Luxury Scrollbar */
@@ -23,14 +25,14 @@ body {
   width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #0d0a08;
+  background: #09090b;
 }
 ::-webkit-scrollbar-thumb {
-  background: #785600;
+  background: #3f3f46;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4af37;
+  background: #a855f7;
 }
 
 /* Ambient full-screen backdrop that smoothly cross-fades behind the website */
@@ -40,7 +42,7 @@ body {
   z-index: 5;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(circle at center, rgba(30, 24, 18, 0.95) 0%, rgba(10, 8, 6, 1) 100%);
+  background: radial-gradient(circle at center, rgba(39, 39, 42, 0.95) 0%, rgba(24, 24, 27, 1) 100%);
   transition: opacity 1.2s ease;
 }
 
@@ -116,10 +118,10 @@ body {
   top: 1.5rem;
   right: 1.5rem;
   z-index: 35;
-  background: rgba(13, 10, 8, 0.65);
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: rgba(24, 24, 27, 0.75);
+  border: 1px solid rgba(168, 85, 247, 0.4);
   backdrop-filter: blur(12px);
-  color: #fff;
+  color: #f4f4f5;
   padding: 0.5rem 1.15rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -135,10 +137,10 @@ body {
 }
 
 #skip-to-website-btn:hover {
-  background: rgba(212, 175, 55, 0.25);
-  border-color: var(--gold-bright);
+  background: rgba(168, 85, 247, 0.25);
+  border-color: var(--purple-bright);
   color: #fff;
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
   transform: translateY(-1px);
 }
 
@@ -148,10 +150,10 @@ body {
   bottom: 24px;
   left: 24px;
   z-index: 45;
-  background: rgba(30, 27, 25, 0.9);
-  border: 1px solid rgba(212, 175, 55, 0.5);
+  background: rgba(24, 24, 27, 0.9);
+  border: 1px solid rgba(168, 85, 247, 0.5);
   backdrop-filter: blur(8px);
-  color: var(--gold-bright);
+  color: var(--purple-bright);
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -163,13 +165,14 @@ body {
   align-items: center;
   gap: 0.45rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 
 #replay-cinematic-pill:hover {
-  background: var(--gold-primary);
-  color: #1e1b19;
-  border-color: var(--gold-bright);
+  background: var(--purple-primary);
+  color: #ffffff;
+  border-color: var(--purple-bright);
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.5);
   transform: translateY(-1px);
 }
 
