@@ -16,7 +16,7 @@
   ],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "sharp": "^0.35.5"
   }
 }
