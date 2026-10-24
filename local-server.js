@@ -78,7 +78,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`=======================================================`);
-  console.log(` Rajput Jewellers - Local Development Server`);
+  console.log(` Royal Jewellers - Local Development Server`);
   console.log(` Running at: http://localhost:${PORT}`);
   console.log(` Press Ctrl + C to stop`);
   console.log(`=======================================================`);

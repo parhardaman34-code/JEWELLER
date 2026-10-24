@@ -1,5 +1,5 @@
 /**
- * RAJPUT JEWELLERS - GSAP PINNED FRAME SEQUENCE & WEBSITE TRANSITION
+ * ROYAL JEWELLERS - GSAP PINNED FRAME SEQUENCE & WEBSITE TRANSITION
  * Bulletproof Production Edition: Zero-blank screen, instant image fallback, rock-solid scroll.
  */
 
@@ -8,7 +8,7 @@
 
   function initSequence() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-      console.warn('[Rajput] GSAP / ScrollTrigger not yet available, retrying in 50ms...');
+      console.warn('[Royal Jewellers] GSAP / ScrollTrigger not yet available, retrying in 50ms...');
       setTimeout(initSequence, 50);
       return;
     }
@@ -16,7 +16,7 @@
     try {
       gsap.registerPlugin(ScrollTrigger);
     } catch (e) {
-      console.warn('[Rajput] ScrollTrigger registration note:', e);
+      console.warn('[Royal Jewellers] ScrollTrigger registration note:', e);
     }
 
     const TOTAL_FRAMES = 210;
@@ -36,7 +36,7 @@
     const siteHeader = document.getElementById('site-header');
 
     if (!section || !pinViewport || !canvas) {
-      console.error('[Rajput] Essential DOM elements missing for scroll sequence.');
+      console.error('[Royal Jewellers] Essential DOM elements missing for scroll sequence.');
       return;
     }
 

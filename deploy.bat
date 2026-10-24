@@ -1,7 +1,7 @@
 @echo off
-title Rajput Jewellers - Vercel Deployment
+title Royal Jewellers - Vercel Deployment
 echo =======================================================
-echo   Deploying Rajput Jewellers to Vercel (Production)
+echo   Deploying Royal Jewellers to Vercel (Production)
 echo =======================================================
 echo.
 echo Step 1: Checking authentication...

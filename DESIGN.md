@@ -1,5 +1,5 @@
 ---
-name: Rajput Heritage Luxury
+name: Royal Heritage Luxury
 colors:
   surface: '#fff8f5'
   surface-dim: '#e0d8d5'
@@ -239,7 +239,7 @@ The design system adopts a **Soft (`1`) shape profile**. Luxury heritage design 
 - Labels sit cleanly above the field in uppercase `label-md` tracking, accompanied by optional carat/weight unit suffixes.
 
 ### Gold Rate Ticker / Bar
-- An authoritative, persistent top-level notification bar displaying today's 24KT and 22KT market rates per gram in Jagraon/Punjab. Set in high-contrast obsidian with metallic gold numerical highlights.
+- An authoritative, persistent top-level notification bar displaying today's 24KT and 22KT market rates per gram. Set in high-contrast obsidian with metallic gold numerical highlights.
 
 ### Bespoke Bridal Consultation Drawer
 - A sliding panel that mirrors an exclusive VIP salon room: rich dark backdrop, velvet-toned accents, and calendar slots for private viewing in the showroom.

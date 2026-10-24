@@ -1,7 +1,7 @@
 @echo off
-title Rajput Jewellers - Push to GitHub
+title Royal Jewellers - Push to GitHub
 echo =======================================================
-echo   Rajput Jewellers - GitHub Push to parhardaman34-code
+echo   Royal Jewellers - GitHub Push to parhardaman34-code
 echo =======================================================
 echo.
 echo Target Repository: https://github.com/parhardaman34-code/JEWELLER.git

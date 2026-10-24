@@ -1,5 +1,5 @@
 /**
- * RAJPUT JEWELLERS - CINEMATIC DRONE FLIGHT & STAGE COORDINATOR
+ * ROYAL JEWELLERS - CINEMATIC DRONE FLIGHT & STAGE COORDINATOR
  * Orchestrates Drone Approach, Showroom Entrance, and Homepage Reveal
  */
 
@@ -52,7 +52,7 @@
       // Camera descends from 28m down to 14m
       const alt = (28.4 - smooth1 * 14.4).toFixed(1);
       if (telemetryAlt) telemetryAlt.textContent = `ALT: ${alt}m • 24.8 FPS`;
-      if (telemetryLoc) telemetryLoc.textContent = `Jagraon Market Overhead • Golden Hour`;
+      if (telemetryLoc) telemetryLoc.textContent = `Flagship Market Overhead • Golden Hour`;
 
       // Scale & translate layer 1
       if (layerAerial) {
@@ -65,7 +65,7 @@
     }
 
     // -----------------------------------------------------------------
-    // SCENE 2: Approaching Rajput Jewellers on Anarkali Bazar Rd (p: 0.38 to 0.72)
+    // SCENE 2: Approaching Royal Jewellers Flagship (p: 0.38 to 0.72)
     // -----------------------------------------------------------------
     else if (p > 0.38 && p <= 0.72) {
       const t2 = (p - 0.38) / 0.34;
@@ -80,7 +80,7 @@
 
       const alt = (14.0 - smooth2 * 11.8).toFixed(1);
       if (telemetryAlt) telemetryAlt.textContent = `ALT: ${alt}m • DESCENDING`;
-      if (telemetryLoc) telemetryLoc.textContent = `Anarkali Bazar Rd • Approaching Rajput Jewellers`;
+      if (telemetryLoc) telemetryLoc.textContent = `Approaching Royal Jewellers Flagship`;
     }
 
     // -----------------------------------------------------------------
@@ -91,7 +91,7 @@
       const smooth3 = easeOutQuad(t3);
 
       if (telemetryAlt) telemetryAlt.textContent = `ALT: 1.6m • SHOWROOM INTERIOR`;
-      if (telemetryLoc) telemetryLoc.textContent = `Rajput Jewellers Flagship Showroom`;
+      if (telemetryLoc) telemetryLoc.textContent = `Royal Jewellers Flagship Showroom`;
 
       if (layerApproach) {
         layerApproach.style.opacity = `${Math.max(0, 1 - smooth3 * 1.5)}`;
@@ -137,14 +137,14 @@
     }
 
     // Initialize 210-frame canvas scroll animation
-    if (window.RajputNecklaceScroll && !window._necklaceInitialized) {
+    if (window.RoyalNecklaceScroll && !window._necklaceInitialized) {
       window._necklaceInitialized = true;
-      window.RajputNecklaceScroll.init();
-    } else if (window.RajputNecklaceScroll) {
-      window.RajputNecklaceScroll.reset();
-    } else if (window.RajputNecklace3D && !window._necklaceInitialized) {
+      window.RoyalNecklaceScroll.init();
+    } else if (window.RoyalNecklaceScroll) {
+      window.RoyalNecklaceScroll.reset();
+    } else if (window.RoyalNecklace3D && !window._necklaceInitialized) {
       window._necklaceInitialized = true;
-      window.RajputNecklace3D.init();
+      window.RoyalNecklace3D.init();
     }
   }
 
@@ -201,10 +201,10 @@
       droneStage.style.pointerEvents = 'auto';
     }
 
-    if (window.RajputNecklaceScroll) {
-      window.RajputNecklaceScroll.reset();
-    } else if (window.RajputNecklace3D) {
-      window.RajputNecklace3D.setAssemblyStep(0);
+    if (window.RoyalNecklaceScroll) {
+      window.RoyalNecklaceScroll.reset();
+    } else if (window.RoyalNecklace3D) {
+      window.RoyalNecklace3D.setAssemblyStep(0);
     }
 
     droneAnimFrame = requestAnimationFrame(updateDroneFlight);
@@ -212,7 +212,7 @@
 
   // DOM Content Loaded Initializer
   function init() {
-    masterExperience = document.getElementById('rajput-cinematic-experience');
+    masterExperience = document.getElementById('royal-cinematic-experience');
     droneStage = document.getElementById('drone-stage');
     necklaceStage = document.getElementById('necklace-stage');
 
@@ -259,7 +259,7 @@
   }
 
   // Expose API
-  window.RajputCinematic = {
+  window.RoyalCinematic = {
     init: init,
     transitionToNecklaceStage: transitionToNecklaceStage,
     completeAndRevealHomepage: completeAndRevealHomepage,

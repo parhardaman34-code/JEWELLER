@@ -1,5 +1,5 @@
 /**
- * RAJPUT JEWELLERS - 210-FRAME LUXURY BRIDAL NECKLACE SCROLL ANIMATION
+ * ROYAL JEWELLERS - 210-FRAME LUXURY BRIDAL NECKLACE SCROLL ANIMATION
  * Ultra-smooth HTML5 Canvas Scrubbing Engine with Inertia & Touch Support
  */
 
@@ -48,7 +48,7 @@
     {
       maxFrame: 210,
       badge: "Masterpiece Complete",
-      title: "Imperial 22K Rajput Bridal Choker Suite",
+      title: "Imperial 22K Royal Bridal Choker Suite",
       desc: "Imperial Kundan Polki masterpiece unified in pure 22KT gold. Ready for the bridal trousseau."
     }
   ];
@@ -214,7 +214,7 @@
         scrollDeltaBuffer += e.deltaY;
         if (scrollDeltaBuffer > 35) {
           scrollDeltaBuffer = 0;
-          window.RajputCinematic && window.RajputCinematic.completeAndRevealHomepage();
+          window.RoyalCinematic && window.RoyalCinematic.completeAndRevealHomepage();
         }
       } else {
         scrollDeltaBuffer = 0;
@@ -251,7 +251,7 @@
           scrollDeltaBuffer += diffY;
           if (scrollDeltaBuffer > 20) {
             scrollDeltaBuffer = 0;
-            window.RajputCinematic && window.RajputCinematic.completeAndRevealHomepage();
+            window.RoyalCinematic && window.RoyalCinematic.completeAndRevealHomepage();
           }
         } else {
           scrollDeltaBuffer = 0;
@@ -357,7 +357,7 @@
   }
 
   // Public API
-  window.RajputNecklaceScroll = {
+  window.RoyalNecklaceScroll = {
     init: init,
     setFrame: (f) => { targetFrameIndex = Math.max(1, Math.min(TOTAL_FRAMES, f)); },
     jumpToPhase: jumpToPhase,
@@ -366,7 +366,7 @@
   };
 
   // Backwards compatibility alias if referenced anywhere
-  window.RajputNecklace3D = {
+  window.RoyalNecklace3D = {
     init: init,
     setAssemblyStep: (step) => jumpToPhase(step || 1),
     getIsAssembled: () => isCompleted

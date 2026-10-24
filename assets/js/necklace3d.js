@@ -1,5 +1,5 @@
 /**
- * RAJPUT JEWELLERS - 3D ROYAL KUNDAN POLKI BRIDAL NECKLACE ASSEMBLY
+ * ROYAL JEWELLERS - 3D ROYAL KUNDAN POLKI BRIDAL NECKLACE ASSEMBLY
  * High-fidelity WebGL / Three.js Interactive Component
  */
 
@@ -549,7 +549,7 @@
         setAssemblyStep(currentStep + 1);
       } else {
         // Complete transition to existing homepage
-        window.RajputCinematic && window.RajputCinematic.completeAndRevealHomepage();
+        window.RoyalCinematic && window.RoyalCinematic.completeAndRevealHomepage();
       }
     } else if (scrollAccumulator < -SCROLL_THRESHOLD) {
       scrollAccumulator = 0;
@@ -579,7 +579,7 @@
         touchStartY = touchEndY;
         if (diffY > 0) {
           if (currentStep < 5) setAssemblyStep(currentStep + 1);
-          else window.RajputCinematic && window.RajputCinematic.completeAndRevealHomepage();
+          else window.RoyalCinematic && window.RoyalCinematic.completeAndRevealHomepage();
         } else {
           if (currentStep > 0) setAssemblyStep(currentStep - 1);
         }
@@ -662,7 +662,7 @@
   }
 
   // Expose API
-  window.RajputNecklace3D = {
+  window.RoyalNecklace3D = {
     init: init,
     setAssemblyStep: setAssemblyStep,
     nextStep: () => setAssemblyStep(currentStep + 1),
