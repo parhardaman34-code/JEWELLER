@@ -193,12 +193,12 @@
               }
             }
 
-            // Smoothly reveal header towards completion
+            // Deepen transparent header on scroll
             if (siteHeader) {
-              if (self.progress >= 0.70 || window.scrollY >= (self.end - 150)) {
-                siteHeader.classList.add('visible');
+              if (self.progress >= 0.35 || window.scrollY >= 200) {
+                siteHeader.classList.add('header-scrolled');
               } else {
-                siteHeader.classList.remove('visible');
+                siteHeader.classList.remove('header-scrolled');
               }
             }
           }
@@ -228,14 +228,13 @@
         duration: 0.8
       });
 
-      // Scroll listener: guarantees header is visible on website
+      // Scroll listener: toggles transparent glass vs frosted scrolled glass
       window.addEventListener('scroll', () => {
         if (!siteHeader) return;
-        const triggerEnd = scrollTriggerInstance ? scrollTriggerInstance.end : 900;
-        if (window.scrollY >= triggerEnd - 150) {
-          siteHeader.classList.add('visible');
-        } else if (scrollTriggerInstance && scrollTriggerInstance.progress < 0.70) {
-          siteHeader.classList.remove('visible');
+        if (window.scrollY >= 150) {
+          siteHeader.classList.add('header-scrolled');
+        } else if (scrollTriggerInstance && scrollTriggerInstance.progress < 0.35) {
+          siteHeader.classList.remove('header-scrolled');
         }
       }, { passive: true });
 
@@ -247,7 +246,7 @@
             top: targetY,
             behavior: 'smooth'
           });
-          if (siteHeader) siteHeader.classList.add('visible');
+          if (siteHeader) siteHeader.classList.add('header-scrolled');
         });
       }
 
@@ -258,7 +257,7 @@
             top: 0,
             behavior: 'smooth'
           });
-          if (siteHeader) siteHeader.classList.remove('visible');
+          if (siteHeader) siteHeader.classList.remove('header-scrolled');
         });
       }
 
@@ -266,6 +265,124 @@
       renderFrame(1);
       setTimeout(() => ScrollTrigger.refresh(), 100);
       setTimeout(() => ScrollTrigger.refresh(), 400);
+
+      // Initialize navigation interactivity & smooth scrolling
+      setupNavigation();
+    }
+
+    // Interactive Navigation Bar Handler
+    function setupNavigation() {
+      const mobileToggle = document.getElementById('mobile-menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const mobileIcon = document.getElementById('mobile-menu-icon');
+      const brandLink = document.getElementById('site-brand-link');
+
+      // Mobile Menu Toggle
+      if (mobileToggle && mobileMenu) {
+        mobileToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isHidden = mobileMenu.classList.contains('hidden');
+          if (isHidden) {
+            mobileMenu.classList.remove('hidden');
+            if (mobileIcon) mobileIcon.textContent = 'close';
+          } else {
+            mobileMenu.classList.add('hidden');
+            if (mobileIcon) mobileIcon.textContent = 'menu';
+          }
+        });
+
+        // Close mobile menu on outside click
+        document.addEventListener('click', (e) => {
+          if (!mobileMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+            mobileMenu.classList.add('hidden');
+            if (mobileIcon) mobileIcon.textContent = 'menu';
+          }
+        });
+      }
+
+      // Brand logo click scrolls to top
+      if (brandLink) {
+        brandLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (mobileMenu) mobileMenu.classList.add('hidden');
+          if (mobileIcon) mobileIcon.textContent = 'menu';
+        });
+      }
+
+      // Smooth scroll for all hash navigation links with header offset
+      const allHashLinks = document.querySelectorAll('a[href^="#"]');
+      allHashLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          if (!href || href === '#') return;
+
+          const target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            const header = document.getElementById('site-header');
+            const headerHeight = header ? header.offsetHeight : 80;
+            const targetTop = target.getBoundingClientRect().top + window.pageYOffset - (headerHeight + 10);
+
+            window.scrollTo({
+              top: Math.max(0, targetTop),
+              behavior: 'smooth'
+            });
+
+            // Update active state on desktop navbar
+            document.querySelectorAll('#desktop-nav .nav-item').forEach(navItem => {
+              if (navItem.getAttribute('href') === href) {
+                navItem.className = 'nav-item px-space-sm py-1 font-label-md text-label-md uppercase tracking-wider transition-all bg-[#a855f7] text-white font-semibold rounded-lg shadow-[0_0_12px_rgba(168,85,247,0.35)]';
+              } else {
+                navItem.className = 'nav-item px-space-sm py-1 font-label-md text-label-md uppercase tracking-wider text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#27272a]/60 rounded-lg transition-all';
+              }
+            });
+
+            // Close mobile menu
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+              mobileMenu.classList.add('hidden');
+              if (mobileIcon) mobileIcon.textContent = 'menu';
+            }
+          }
+        });
+      });
+
+      // Active section spy on scroll
+      const spySections = [
+        { id: 'signature-collections', link: '#signature-collections' },
+        { id: 'gold-jewellery', link: '#gold-jewellery' },
+        { id: 'diamond-polki', link: '#diamond-polki' },
+        { id: 'silver-collection', link: '#silver-collection' },
+        { id: 'daily-gold-rate', link: '#daily-gold-rate' },
+        { id: 'showroom-visit', link: '#showroom-visit' }
+      ];
+
+      window.addEventListener('scroll', () => {
+        const scrollPos = window.scrollY + 250;
+        let activeLink = '';
+
+        spySections.forEach(({ id, link }) => {
+          const el = document.getElementById(id);
+          if (el) {
+            const top = el.offsetTop;
+            const height = el.offsetHeight;
+            if (scrollPos >= top && scrollPos < top + height) {
+              activeLink = link;
+            }
+          }
+        });
+
+        if (activeLink) {
+          document.querySelectorAll('#desktop-nav .nav-item').forEach(navItem => {
+            if (navItem.getAttribute('href') === activeLink) {
+              navItem.className = 'nav-item px-space-sm py-1 font-label-md text-label-md uppercase tracking-wider transition-all bg-[#a855f7] text-white font-semibold rounded-lg shadow-[0_0_12px_rgba(168,85,247,0.35)]';
+            } else {
+              navItem.className = 'nav-item px-space-sm py-1 font-label-md text-label-md uppercase tracking-wider text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-[#27272a]/60 rounded-lg transition-all';
+            }
+          });
+        }
+      }, { passive: true });
+    }
     }
 
     resizeCanvas();
