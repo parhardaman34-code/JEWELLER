@@ -207,8 +207,13 @@
       necklaceStage.classList.add('active');
     }
 
-    // Initialize Three.js WebGL scene if not already initialized
-    if (window.RajputNecklace3D && !window._necklaceInitialized) {
+    // Initialize 210-frame canvas scroll animation
+    if (window.RajputNecklaceScroll && !window._necklaceInitialized) {
+      window._necklaceInitialized = true;
+      window.RajputNecklaceScroll.init();
+    } else if (window.RajputNecklaceScroll) {
+      window.RajputNecklaceScroll.reset();
+    } else if (window.RajputNecklace3D && !window._necklaceInitialized) {
       window._necklaceInitialized = true;
       window.RajputNecklace3D.init();
     }
@@ -267,7 +272,9 @@
       droneStage.style.pointerEvents = 'auto';
     }
 
-    if (window.RajputNecklace3D) {
+    if (window.RajputNecklaceScroll) {
+      window.RajputNecklaceScroll.reset();
+    } else if (window.RajputNecklace3D) {
       window.RajputNecklace3D.setAssemblyStep(0);
     }
 

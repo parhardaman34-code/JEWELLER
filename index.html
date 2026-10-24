@@ -58,31 +58,44 @@
     </div>
   </div>
 
-  <!-- STAGE 2: LUXURY 3D NECKLACE ASSEMBLY -->
+  <!-- STAGE 2: LUXURY 210-FRAME NECKLACE SCROLL ANIMATION -->
   <div id="necklace-stage">
     <div class="necklace-spotlight"></div>
-    <!-- Interactive WebGL 3D Canvas -->
-    <div id="necklace-canvas-container"></div>
+    <!-- Interactive Canvas Viewport for 210 Frames -->
+    <div id="necklace-canvas-container">
+      <canvas id="necklace-canvas"></canvas>
+    </div>
 
     <!-- Necklace Assembly HUD & Progress Controls -->
     <div class="necklace-hud">
       <div class="assembly-info">
-        <span id="assembly-step-badge" class="assembly-step-badge">Exploded View</span>
+        <div class="flex items-center justify-between mb-1">
+          <span id="assembly-step-badge" class="assembly-step-badge">Phase 1 / 5</span>
+          <span id="necklace-frame-counter" class="text-[11px] text-[#ffd700] uppercase tracking-wider font-semibold">Frame 1 / 210</span>
+        </div>
         <h3 id="assembly-step-title" class="assembly-step-title">Handcrafted 22KT Heirloom Components</h3>
-        <p id="assembly-step-desc" class="assembly-step-desc">Individual karigari elements floating in 3D showroom space. Scroll down to assemble.</p>
+        <p id="assembly-step-desc" class="assembly-step-desc">Individual bridal karigari elements floating in showroom space. Scroll down to assemble.</p>
+        
+        <!-- Interactive Scrubber Track -->
+        <div class="mt-3 flex items-center gap-2">
+          <span class="text-[10px] uppercase tracking-wider text-[#d3c4af]">Scrub:</span>
+          <div id="necklace-scrubber-track" class="relative flex-1 h-2 bg-[#2d241a] rounded-full cursor-pointer overflow-hidden border border-[rgba(212,175,55,0.3)]">
+            <div id="necklace-scrubber-fill" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-[#785600] via-[#d4af37] to-[#ffd700] w-0 transition-all duration-75"></div>
+          </div>
+        </div>
       </div>
 
       <div class="assembly-tracker">
-        <div id="step-dot-1" class="assembly-dot" title="Phase 1: Collar Lattice"></div>
-        <div id="step-dot-2" class="assembly-dot" title="Phase 2: Central Medallion"></div>
-        <div id="step-dot-3" class="assembly-dot" title="Phase 3: Polki Side Links"></div>
-        <div id="step-dot-4" class="assembly-dot" title="Phase 4: Basra Pearls"></div>
+        <div id="step-dot-1" class="assembly-dot active" title="Phase 1: Components"></div>
+        <div id="step-dot-2" class="assembly-dot" title="Phase 2: Collar Mesh"></div>
+        <div id="step-dot-3" class="assembly-dot" title="Phase 3: Central Medallion"></div>
+        <div id="step-dot-4" class="assembly-dot" title="Phase 4: Earrings & Drops"></div>
         <div id="step-dot-5" class="assembly-dot" title="Phase 5: Masterpiece Complete"></div>
       </div>
 
       <div class="scroll-prompt-indicator">
         <span class="material-symbols-outlined text-[16px]">expand_more</span>
-        <span>Scroll Down to Assemble Masterpiece (4-5 Scrolls)</span>
+        <span>Scroll Down to Assemble Royal Suite</span>
         <span class="material-symbols-outlined text-[16px]">expand_more</span>
       </div>
 
@@ -800,7 +813,7 @@
 <script src="assets/vendor/three.min.js"></script>
 <script src="assets/vendor/gsap.min.js"></script>
 <script src="assets/vendor/ScrollTrigger.min.js"></script>
-<!-- Rajput Jewellers 3D & Cinematic Modules -->
-<script src="assets/js/necklace3d.js"></script>
+<!-- Rajput Jewellers 210-Frame Scroll & Cinematic Modules -->
+<script src="assets/js/necklace-scroll.js"></script>
 <script src="assets/js/drone-cinematic.js"></script>
 </body></html>
