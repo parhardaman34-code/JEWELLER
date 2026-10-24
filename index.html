@@ -730,8 +730,16 @@
   <span>Replay Assembly</span>
 </button>
 
-<!-- GSAP & ScrollTrigger Animation Engine -->
-<script src="assets/vendor/gsap.min.js"></script>
-<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<!-- GSAP & ScrollTrigger Animation Engine (CDN with local fallback) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+  if (typeof gsap === 'undefined') {
+    document.write('<script src="assets/vendor/gsap.min.js"><\/script>');
+  }
+  if (typeof ScrollTrigger === 'undefined') {
+    document.write('<script src="assets/vendor/ScrollTrigger.min.js"><\/script>');
+  }
+</script>
 <script src="assets/js/gsap-scroll-sequence.js"></script>
 </body></html>

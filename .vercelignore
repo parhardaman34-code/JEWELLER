@@ -1,5 +1,7 @@
+local-server.js
 server.js
 scripts/
 start.bat
 deploy.bat
+push-to-github.bat
 *.backup.*

@@ -4,8 +4,8 @@
   "description": "Rajput Jewellers - Heritage Bridal Jewellery Showroom in Jagraon, Punjab",
   "main": "index.html",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node local-server.js",
+    "dev": "node local-server.js"
   },
   "keywords": [
     "jewellery",
