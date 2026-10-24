@@ -206,3 +206,51 @@ body {
   border-bottom: 1px solid rgba(168, 85, 247, 0.25);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
 }
+
+/* ==========================================================================
+   MAGNETIC PULL BUTTONS & MULTI-PLANE PARALLAX DEPTH
+   ========================================================================== */
+
+.magnetic-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transition: box-shadow 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.magnetic-btn > * {
+  will-change: transform;
+  pointer-events: none; /* Let the button container track coordinates smoothly */
+}
+
+/* Multi-Plane Parallax Containers & Image Masking */
+.parallax-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.parallax-img {
+  will-change: transform;
+  transform: scale(1.09) translate3d(0, 0, 0);
+  transition: filter 0.5s ease;
+}
+
+/* Background Ambient Glow Auras (Slow Background Plane) */
+.parallax-aura {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(90px);
+  -webkit-filter: blur(90px);
+  will-change: transform, opacity;
+  opacity: 0.65;
+}
+
+/* Foreground Floating Badges (Fast Foreground Plane) */
+.parallax-badge {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+

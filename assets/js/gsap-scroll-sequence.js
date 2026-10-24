@@ -268,6 +268,8 @@
 
       // Initialize navigation interactivity & smooth scrolling
       setupNavigation();
+      setupMagneticButtons();
+      setupMultiPlaneParallax();
     }
 
     // Interactive Navigation Bar Handler
@@ -383,6 +385,110 @@
         }
       }, { passive: true });
     }
+
+    // --------------------------------------------------------------------------
+    // 1. Magnetic Pull Buttons
+    // Smooth spring cursor tracking for luxury interactive elements
+    // --------------------------------------------------------------------------
+    function setupMagneticButtons() {
+      if (window.matchMedia('(pointer: coarse)').matches) return; // Touchscreen safety
+
+      const buttons = document.querySelectorAll('.magnetic-btn');
+      buttons.forEach(btn => {
+        const strength = 0.35;
+        const innerStrength = 0.15;
+        const inner = btn.querySelector('span, .material-symbols-outlined');
+
+        const xTo = gsap.quickTo(btn, 'x', { duration: 0.45, ease: 'power3.out' });
+        const yTo = gsap.quickTo(btn, 'y', { duration: 0.45, ease: 'power3.out' });
+        const ixTo = inner ? gsap.quickTo(inner, 'x', { duration: 0.35, ease: 'power2.out' }) : null;
+        const iyTo = inner ? gsap.quickTo(inner, 'y', { duration: 0.35, ease: 'power2.out' }) : null;
+
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const relX = e.clientX - (rect.left + rect.width / 2);
+          const relY = e.clientY - (rect.top + rect.height / 2);
+
+          xTo(relX * strength);
+          yTo(relY * strength);
+          if (ixTo) ixTo(relX * innerStrength);
+          if (iyTo) iyTo(relY * innerStrength);
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          xTo(0);
+          yTo(0);
+          if (ixTo) ixTo(0);
+          if (iyTo) iyTo(0);
+        });
+      });
+    }
+
+    // --------------------------------------------------------------------------
+    // 2. Multi-Plane Parallax Depth
+    // Jewellery imagery, background auras, and badges move at tiered speeds
+    // --------------------------------------------------------------------------
+    function setupMultiPlaneParallax() {
+      if (typeof ScrollTrigger === 'undefined') return;
+
+      // Plane 1: Background Ambient Glow Auras (Slow drift: y -40px to +40px)
+      const auras = document.querySelectorAll('.parallax-aura');
+      auras.forEach(aura => {
+        const section = aura.closest('section') || aura.parentElement;
+        gsap.fromTo(aura,
+          { y: -35, opacity: 0.45 },
+          {
+            y: 35,
+            opacity: 0.85,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: section,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.5
+            }
+          }
+        );
+      });
+
+      // Plane 2: Showcase Jewellery Images (Masked Parallax: yPercent -7 to +7)
+      const parallaxImages = document.querySelectorAll('.parallax-img');
+      parallaxImages.forEach(img => {
+        const container = img.closest('.parallax-container') || img.parentElement;
+        gsap.fromTo(img,
+          { yPercent: -7 },
+          {
+            yPercent: 7,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: container,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.2
+            }
+          }
+        );
+      });
+
+      // Plane 3: Floating Foreground Badges & Monogram Chips (Fast drift: y 15px to -22px)
+      const badges = document.querySelectorAll('.parallax-badge');
+      badges.forEach((badge, index) => {
+        const triggerEl = badge.closest('section') || badge.parentElement;
+        const distance = (index % 2 === 0) ? -22 : -16;
+        gsap.fromTo(badge,
+          { y: 15 },
+          {
+            y: distance,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: triggerEl,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.6
+            }
+          }
+        );
+      });
     }
 
     resizeCanvas();
