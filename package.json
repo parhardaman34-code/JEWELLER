@@ -15,5 +15,8 @@
     "gold"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "sharp": "^0.35.5"
+  }
 }
