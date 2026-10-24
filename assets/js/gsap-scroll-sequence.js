@@ -25,16 +25,19 @@
     let lastRenderedIdx = -1;
     let scrollTriggerInstance = null;
 
-    const heroSection = document.getElementById('hero-section');
-    const container = document.getElementById('hero-necklace-container');
+    const section = document.getElementById('necklace-scroll-section');
+    const pinViewport = document.getElementById('necklace-pin-viewport');
+    const container = document.getElementById('necklace-canvas-container');
     const fallbackImg = document.getElementById('necklace-fallback-img');
     const canvas = document.getElementById('necklace-canvas');
     const scrollPrompt = document.getElementById('necklace-scroll-prompt');
+    const introOverlay = document.getElementById('necklace-intro-overlay');
+    const skipBtn = document.getElementById('skip-to-website-btn');
     const replayBtn = document.getElementById('replay-cinematic-pill');
     const siteHeader = document.getElementById('site-header');
 
-    if (!container || !canvas) {
-      console.warn('[Royal Jewellers] Hero necklace container or canvas missing; skipping frame sequence.');
+    if (!section || !pinViewport || !canvas) {
+      console.warn('[Royal Jewellers] Essential DOM elements missing for dedicated scroll sequence.');
       setupNavigation();
       setupMagneticButtons();
       setupMultiPlaneParallax();
@@ -126,8 +129,8 @@
       const rect = container.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      const rectWidth = rect.width || container.clientWidth || 600;
-      const rectHeight = rect.height || container.clientHeight || 500;
+      const rectWidth = rect.width || window.innerWidth || 1280;
+      const rectHeight = rect.height || window.innerHeight || 720;
 
       const w = Math.max(320, Math.round(rectWidth * dpr));
       const h = Math.max(240, Math.round(rectHeight * dpr));
@@ -186,35 +189,21 @@
       setTimeout(() => loadRemainingBatch(36, 30), 100);
     }
 
-    // Build the GSAP ScrollTrigger timeline & Hero interactions
+    // Build the GSAP ScrollTrigger timeline & Dedicated Section Transition
     function setupScrollTrigger() {
-      // 1. Header transparency / frosted glass on scroll
-      const updateHeader = () => {
-        if (!siteHeader) return;
-        if (window.scrollY >= 50) {
-          siteHeader.classList.add('header-scrolled');
-        } else {
-          siteHeader.classList.remove('header-scrolled');
-        }
-      };
-      window.addEventListener('scroll', updateHeader, { passive: true });
-      updateHeader();
-
-      // 2. Scrub frames smoothly as user scrolls past the hero section
-      if (heroSection) {
-        scrollTriggerInstance = ScrollTrigger.create({
-          trigger: heroSection,
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
           start: 'top top',
-          end: 'bottom top+=100',
-          scrub: 0.6,
+          end: '+=950', // 4 to 5 natural mouse-wheel scrolls
+          pin: pinViewport,
+          scrub: 0.5,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            const target = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(1 + self.progress * (TOTAL_FRAMES - 1))));
-            frameObj.frame = target;
-            renderFrame(target);
-
+            // Hide scroll prompt once user starts scrolling
             if (scrollPrompt) {
-              if (self.progress > 0.08) {
+              if (self.progress > 0.05) {
                 scrollPrompt.style.opacity = '0';
                 scrollPrompt.style.pointerEvents = 'none';
               } else {
@@ -222,55 +211,86 @@
                 scrollPrompt.style.pointerEvents = 'auto';
               }
             }
+
+            // Fade out the intro atelier overlay as scroll progresses
+            if (introOverlay) {
+              if (self.progress > 0.12) {
+                introOverlay.style.opacity = '0';
+              } else {
+                introOverlay.style.opacity = String(Math.max(0, 1 - self.progress * 8));
+              }
+            }
+
+            // Deepen transparent header on scroll
+            if (siteHeader) {
+              if (self.progress >= 0.35 || window.scrollY >= 200) {
+                siteHeader.classList.add('header-scrolled');
+              } else {
+                siteHeader.classList.remove('header-scrolled');
+              }
+            }
           }
-        });
-      }
-
-      // 3. Interactive horizontal mouse tracking across the 3D necklace card
-      if (container) {
-        container.addEventListener('mousemove', (e) => {
-          const rect = container.getBoundingClientRect();
-          const progress = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          const target = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(1 + progress * (TOTAL_FRAMES - 1))));
-          gsap.to(frameObj, {
-            frame: target,
-            duration: 0.25,
-            ease: 'power1.out',
-            overwrite: 'auto',
-            onUpdate: () => renderFrame(frameObj.frame)
-          });
-        });
-      }
-
-      // 4. Auto-assembly intro sequence on initial load if user stays at top
-      function playIntroAnimation() {
-        if (window.scrollY < 80) {
-          gsap.to(frameObj, {
-            frame: TOTAL_FRAMES,
-            duration: 2.6,
-            ease: 'power2.out',
-            onUpdate: () => renderFrame(frameObj.frame)
-          });
         }
+      });
+
+      scrollTriggerInstance = tl.scrollTrigger;
+
+      // Phase 1: Scrub frames 1 -> 210
+      tl.to(frameObj, {
+        frame: TOTAL_FRAMES,
+        ease: 'none',
+        duration: 3,
+        onUpdate: () => {
+          renderFrame(frameObj.frame);
+        }
+      });
+
+      // Phase 2: Hold complete necklace
+      tl.to({}, { duration: 0.5 });
+
+      // Phase 3: Dissolve canvas into website
+      tl.to(canvas, {
+        scale: 1.04,
+        opacity: 0,
+        ease: 'power1.inOut',
+        duration: 0.8
+      });
+
+      // Scroll listener: toggles transparent glass vs frosted scrolled glass
+      window.addEventListener('scroll', () => {
+        if (!siteHeader) return;
+        if (window.scrollY >= 150) {
+          siteHeader.classList.add('header-scrolled');
+        } else if (scrollTriggerInstance && scrollTriggerInstance.progress < 0.35) {
+          siteHeader.classList.remove('header-scrolled');
+        }
+      }, { passive: true });
+
+      // Skip Button
+      if (skipBtn) {
+        skipBtn.addEventListener('click', () => {
+          const targetY = scrollTriggerInstance ? (scrollTriggerInstance.end + 20) : (window.innerHeight + 950);
+          window.scrollTo({
+            top: targetY,
+            behavior: 'smooth'
+          });
+          if (siteHeader) siteHeader.classList.add('header-scrolled');
+        });
       }
 
-      // 5. Replay Floating Pill Button
+      // Replay Button
       if (replayBtn) {
         replayBtn.addEventListener('click', () => {
           window.scrollTo({
             top: 0,
             behavior: 'smooth'
           });
+          if (canvas) gsap.set(canvas, { opacity: 1, scale: 1 });
+          if (introOverlay) introOverlay.style.opacity = '1';
+          if (scrollPrompt) scrollPrompt.style.opacity = '1';
+          if (siteHeader) siteHeader.classList.remove('header-scrolled');
           frameObj.frame = 1;
           renderFrame(1);
-          setTimeout(() => {
-            gsap.to(frameObj, {
-              frame: TOTAL_FRAMES,
-              duration: 2.8,
-              ease: 'power2.out',
-              onUpdate: () => renderFrame(frameObj.frame)
-            });
-          }, 450);
         });
       }
 
@@ -278,7 +298,6 @@
       renderFrame(1);
       setTimeout(() => ScrollTrigger.refresh(), 100);
       setTimeout(() => ScrollTrigger.refresh(), 400);
-      setTimeout(playIntroAnimation, 650);
 
       // Initialize navigation interactivity & smooth scrolling
       setupNavigation();
